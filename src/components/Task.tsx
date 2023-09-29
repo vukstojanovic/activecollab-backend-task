@@ -1,83 +1,89 @@
-import { Draggable } from "@hello-pangea/dnd";
-import { TaskProps } from "../types";
+import { Draggable } from "react-beautiful-dnd";
 import comments from "../assets/comments.svg";
 import subtasks from "../assets/subtasks.svg";
 import dayjs from "dayjs";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/reducers";
+import { labels as allLabels, users } from "../store/data";
 
-export default function Task({
-  id,
-  index,
-  name,
-  allLabels,
-  labels,
-  comments_count,
-  open_subtasks,
-  start_on,
-  due_on,
-  users,
-  assignee,
-  is_important,
-}: TaskProps) {
-  function displayDueOnDate(date: string | null) {
+interface TaskProps {
+  id: number;
+  index: number;
+  className?: string;
+}
+
+export default function Task({ id, index, className }: TaskProps) {
+  const task = useSelector((state: RootState) => state.task[id]);
+
+  const {
+    is_important,
+    name,
+    labels,
+    comments_count,
+    open_subtasks,
+    start_on,
+    due_on,
+    assignee,
+    is_completed,
+  } = task;
+  const displayDueOnDate = (date: string | null) => {
     if (!date) return "";
     if (dayjs().year() !== Number(dayjs(date).format("YYYY"))) {
       return dayjs(date).format("MMM D. YYYY");
     } else {
       return dayjs(date).format("MMM D.");
     }
-  }
+  };
 
   return (
-    <Draggable draggableId={id.toString()} index={index}>
+    <Draggable key={id} draggableId={`${id}`} index={index}>
       {(provided) => (
         <div
           className={`m-1 flex min-h-[100px] bg-slate-100 shadow-lg rounded-md border-[1px] overflow-hidden ${
             is_important
               ? "before:bg-pink-600 before:w-1 before:block"
               : "before:bg-slate-100 before:w-1 before:block"
-          }`}
+          } ${is_completed && "before:bg-green-50 bg-green-50"}`}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          data-id={id}
         >
           <div className="flex-1 p-2">
-            <p>{name}</p>
+            <p className={`${is_completed && "line-through"}`}>
+              #{id} {name}
+            </p>
             <div className="flex gap-2 items-center mt-2">
               {labels.length > 5 ? (
                 <div className="flex gap-1 items-center">
-                  {allLabels
-                    .filter((singleLabel) => labels.includes(singleLabel.id))
-                    .slice(0, 5)
-                    .map((filteredLabel) => {
-                      return (
-                        <div
-                          key={filteredLabel.id}
-                          className="w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor: filteredLabel.color,
-                          }}
-                        ></div>
-                      );
-                    })}
+                  {[...labels].slice(0, 5).map((id, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: allLabels[id].color,
+                        }}
+                      />
+                    );
+                  })}
                   <span className="text-gray-400 text-sm">
                     +{labels.length - 5}
                   </span>
                 </div>
               ) : labels.length > 0 ? (
                 <div className="flex gap-1">
-                  {allLabels
-                    .filter((singleLabel) => labels.includes(singleLabel.id))
-                    .map((filteredLabel) => {
-                      return (
-                        <div
-                          key={filteredLabel.id}
-                          className="w-2 h-2 rounded-full"
-                          style={{
-                            backgroundColor: filteredLabel.color,
-                          }}
-                        ></div>
-                      );
-                    })}
+                  {labels.map((id) => {
+                    return (
+                      <div
+                        key={id}
+                        className="w-2 h-2 rounded-full"
+                        style={{
+                          backgroundColor: allLabels[id].color,
+                        }}
+                      ></div>
+                    );
+                  })}
                 </div>
               ) : (
                 <></>
@@ -105,19 +111,17 @@ export default function Task({
                 <span>{displayDueOnDate(due_on)}</span>
               </p>
               <div className="flex -space-x-2">
-                {users
-                  .filter((singleLabel) => assignee.includes(singleLabel.id))
-                  .map((user) => {
-                    const { id, avatar_url, name } = user;
-                    return (
-                      <img
-                        key={id}
-                        src={avatar_url}
-                        alt={name}
-                        className="w-7 h-7 rounded-full"
-                      />
-                    );
-                  })}
+                {assignee.map((id, index) => {
+                  const { avatar_url, name } = users[id];
+                  return (
+                    <img
+                      key={index}
+                      src={avatar_url}
+                      alt={name}
+                      className="w-7 h-7 rounded-full"
+                    />
+                  );
+                })}
               </div>
             </div>
           </div>

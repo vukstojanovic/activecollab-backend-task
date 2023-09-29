@@ -1,18 +1,13 @@
-import { Droppable } from "@hello-pangea/dnd";
-import { CompletedTaskListProps } from "../types";
+import { Droppable } from "react-beautiful-dnd";
 import Task from "../components/Task";
+import { useSelector } from "react-redux";
+import { getCompletedTasks } from "../store/selectors";
 
-export default function CompletedTaskList({
-  allTasks,
-  allLabels,
-  allUsers,
-}: CompletedTaskListProps) {
-  const currentNumberOfTasks = allTasks.filter(
-    (task) => task.is_completed
-  ).length;
+export default function CompletedTaskList() {
+  const completedTasks = useSelector(getCompletedTasks);
 
   return (
-    <Droppable droppableId="20000">
+    <Droppable droppableId="completed-list">
       {(provided) => (
         <div
           {...provided.droppableProps}
@@ -23,29 +18,16 @@ export default function CompletedTaskList({
             <h4 className="font-bold flex items-center gap-2 px-4">
               <span className="text-gray-700 text-lg ">Completed Tasks</span>{" "}
               <span className="text-gray-400 text-md">
-                ({currentNumberOfTasks})
+                ({completedTasks.length})
               </span>
             </h4>
           </div>
           <div className="max-h-[65vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full px-2">
-            {allTasks
-              .filter((singleTask) => singleTask.is_completed)
-              .sort((a, b) => b.position - a.position)
-              .map((singleTask, index) => {
-                return (
-                  <Task
-                    key={singleTask.id}
-                    {...singleTask}
-                    allLabels={allLabels}
-                    users={allUsers}
-                    index={index}
-                  />
-                );
-              })}
+            {completedTasks.map((task, index) => {
+              return <Task key={index} id={task.id} index={index} />;
+            })}
+            {provided.placeholder}
           </div>
-          <button className="px-6 text-violet-700 font-bold mt-2 outline-none capitalize">
-            View completed tasks
-          </button>
         </div>
       )}
     </Droppable>

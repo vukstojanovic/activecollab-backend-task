@@ -1,13 +1,14 @@
 import Modal from "@mui/material/Modal";
 import { useState } from "react";
-import { PromptProps } from "../types";
 
-export default function Prompt({
-  title,
-  closeFn,
-  submitFn,
-  isOpen,
-}: PromptProps) {
+interface Props {
+  title: string;
+  isOpen: boolean;
+  closeFn: () => void;
+  submitFn: (text: string) => void;
+}
+
+export default function Prompt({ title, closeFn, submitFn, isOpen }: Props) {
   const [value, setValue] = useState("");
 
   function handleSubmit() {
@@ -27,6 +28,8 @@ export default function Prompt({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className="p-1"
+            autoFocus
+            required
           />
           <button className="block mt-3 text-white bg-violet-700 px-3 py-1 rounded-md shadow-md">
             Submit

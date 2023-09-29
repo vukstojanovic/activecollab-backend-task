@@ -36,39 +36,10 @@ export interface SingleTask {
   comments_count: number;
   assignee: ArrOfNumbers;
   is_important: boolean;
-}
-[];
-
-export interface TaskProps extends SingleTask {
-  index: number;
-  allLabels: SingleLabel[];
-  users: SingleUser[];
+  completed_on: string | null;
 }
 
-export interface TaskListProps {
-  id: number;
-  name: string;
-  open_tasks: number;
-  is_completed: boolean;
-  allTasks: SingleTask[];
-  allLabels: SingleLabel[];
-  allUsers: SingleUser[];
-  allTaskLists: SingleTaskList[];
-  setSelectedTaskListId: Dispatch<SetStateAction<number | null>>;
-  setTaskLists: Dispatch<SetStateAction<SingleTaskList[]>>;
-  setTasks: Dispatch<SetStateAction<SingleTask[]>>;
-  openTaskModal: () => void;
-}
-
-export interface CompletedTaskListProps {
-  allTasks: SingleTask[];
-  allLabels: SingleLabel[];
-  allUsers: SingleUser[];
-}
-
-export interface PromptProps {
-  title: string;
-  isOpen: boolean;
-  closeFn: () => void;
-  submitFn: (text: string) => void;
+export interface Collection<T> {
+  [key: string]: T;
+  [key: number]: T;
 }

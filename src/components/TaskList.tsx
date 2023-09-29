@@ -1,131 +1,139 @@
-import { Droppable } from "@hello-pangea/dnd";
+import React from "react";
+import Menu from "@mui/material/Menu";
+import IconButton from "@mui/material/IconButton";
+import MenuItem from "@mui/material/MenuItem";
+import { Droppable } from "react-beautiful-dnd";
 import dots from "../assets/trotacka.svg";
-import { TaskListProps } from "../types";
+import { SingleTask } from "../types";
 import Task from "../components/Task";
 import { useState } from "react";
+import Prompt from "./Prompt";
+import { useDispatch, useSelector } from "react-redux";
+import { addTaskAction } from "../store/taskReducer";
+import { RootState } from "../store/reducers";
+import { getTasksByTaskListId } from "../store/selectors";
+import {
+  completeTaskListAction,
+  updateTaskListAction,
+} from "../store/taskListReducer";
 
-export default function TaskList({
-  id,
-  name,
-  open_tasks,
-  allTasks,
-  allLabels,
-  allUsers,
-  allTaskLists,
-  setSelectedTaskListId,
-  setTaskLists,
-  setTasks,
-  openTaskModal,
-}: TaskListProps) {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const currentNumberOfTasks = allTasks.filter(
-    (task) => task.task_list_id === id && !task.is_completed
-  ).length;
+interface Props {
+  id: number;
+}
 
-  function openSelectedTaskModal() {
-    setSelectedTaskListId(id);
-    openTaskModal();
-  }
+const TaskList = ({ id }: Props) => {
+  const [dropdown, setDropdown] = React.useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(dropdown);
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setDropdown(event.currentTarget);
+  };
+  const handleMenuClose = () => {
+    setDropdown(null);
+  };
+  const [modal, setModal] = useState(false);
+  const dispatch = useDispatch();
+  const tasks = useSelector((state: RootState) =>
+    getTasksByTaskListId(state, id),
+  );
+  const taskList = useSelector((state: RootState) => state.taskList[id]);
 
-  function completeTaskList() {
-    const changedTaskLists = allTaskLists.map((tl) => {
-      if (tl.id === id) {
-        tl.is_completed = true;
-        return tl;
-      }
-      return tl;
-    });
-    setTaskLists(changedTaskLists);
-    const changedTasks = allTasks.map((oneTask) => {
-      if (oneTask.task_list_id === id) {
-        oneTask.is_completed = true;
-        return oneTask;
-      }
-      return oneTask;
-    });
-    setTasks(changedTasks);
-  }
+  const completeTaskList = () => {
+    handleMenuClose();
+    dispatch(completeTaskListAction(id));
+  };
 
   function deleteTaskList() {
-    const changedTaskLists = allTaskLists.map((tl) => {
-      if (tl.id === id) {
-        tl.is_trashed = true;
-        return tl;
-      }
-      return tl;
-    });
-    setTaskLists(changedTaskLists);
+    handleMenuClose();
+    dispatch(
+      updateTaskListAction({
+        ...taskList,
+        is_trashed: true,
+      }),
+    );
   }
 
+  const onAddTask = (name: string) => {
+    const position = tasks.length > 0 ? tasks.length : 0;
+    const payload: SingleTask = {
+      id: Date.now(),
+      name,
+      position,
+      is_completed: false,
+      start_on: null,
+      due_on: null,
+      task_list_id: id,
+      comments_count: 0,
+      open_subtasks: 0,
+      is_important: false,
+      assignee: [],
+      labels: [],
+      completed_on: null,
+    };
+
+    dispatch(addTaskAction(payload));
+  };
+
   return (
-    <Droppable droppableId={id.toString()}>
-      {(provided) => (
-        <div
-          {...provided.droppableProps}
-          ref={provided.innerRef}
-          className="w-[350px] py-3 px-1"
-        >
+    <>
+      <Droppable droppableId={`${id}`} direction="vertical">
+        {(provided) => (
           <div
-            className="flex justify-between items-center m-2 mb-5 relative"
-            onMouseLeave={() => setIsDropdownOpen(false)}
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="w-[350px] py-3 px-1"
           >
-            <h4 className="font-bold flex items-center gap-2 px-4">
-              <span className="text-gray-700 text-lg ">{name}</span>{" "}
-              <span className="text-gray-400 text-md">
-                ({currentNumberOfTasks})
-              </span>
-            </h4>
-            <img
-              src={dots}
-              alt="dots"
-              className="cursor-pointer"
-              onMouseOver={() => setIsDropdownOpen(true)}
-            />
-            {isDropdownOpen && (
-              <div className="bg-slate-100 border-slate-200 text-slate-400 border-2 p-2 rounded-lg min-w-[200px] absolute top-7 left-72">
-                <p
-                  className="p-2 cursor-pointer hover:bg-gray-200 hover:rounded-md"
-                  onClick={completeTaskList}
-                >
-                  Complete
-                </p>
-                <p
-                  className="p-2 cursor-pointer hover:bg-gray-200 hover:rounded-md"
-                  onClick={deleteTaskList}
-                >
-                  Move to Trash
-                </p>
-              </div>
-            )}
-          </div>
-          <div className="max-h-[80vh]  scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full px-2">
-            {allTasks
-              .filter(
-                (singleTask) =>
-                  singleTask.task_list_id === id && !singleTask.is_completed
-              )
-              .sort((a, b) => a.position - b.position)
-              .map((singleTask, index) => {
+            <div className="flex justify-between items-center m-2 mb-5">
+              <h4 className="font-bold flex items-center gap-2 px-4">
+                <span className="text-gray-700 text-lg ">{taskList?.name}</span>{" "}
+                <span className="text-gray-400 text-md">({tasks.length})</span>
+              </h4>
+
+              <IconButton
+                onClick={handleMenuOpen}
+                aria-controls={menuOpen ? "basic-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={menuOpen ? "true" : undefined}
+              >
+                <img src={dots} alt="dots" className="cursor-pointer" />
+              </IconButton>
+              <Menu
+                open={menuOpen}
+                onClose={handleMenuClose}
+                sx={{
+                  borderRadius: 8,
+                }}
+                anchorEl={dropdown}
+              >
+                <MenuItem onClick={completeTaskList}>Complete</MenuItem>
+                <MenuItem onClick={deleteTaskList}>Move to Trash</MenuItem>
+              </Menu>
+            </div>
+            <div className="max-h-[80vh]  scrollbar-thin scrollbar-thumb-gray-500 scrollbar-thumb-rounded-full px-2">
+              {tasks.map((singleTask, index) => {
                 return (
-                  <Task
-                    key={`${singleTask.id + index}`}
-                    {...singleTask}
-                    allLabels={allLabels}
-                    users={allUsers}
-                    index={index}
-                  />
+                  <Task key={singleTask.id} id={singleTask.id} index={index} />
                 );
               })}
-          </div>
+              {provided.placeholder}
+            </div>
 
-          <button
-            className="px-6 text-violet-700 font-bold mt-2 outline-none"
-            onClick={openSelectedTaskModal}
-          >
-            + Add task
-          </button>
-        </div>
-      )}
-    </Droppable>
+            <button
+              className="px-6 text-violet-700 font-bold mt-2 outline-none"
+              onClick={() => setModal(true)}
+            >
+              + Add task
+            </button>
+          </div>
+        )}
+      </Droppable>
+      <Prompt
+        title="Add new task"
+        isOpen={modal}
+        closeFn={() => setModal(false)}
+        submitFn={onAddTask}
+      />
+    </>
   );
-}
+};
+
+export default TaskList;
