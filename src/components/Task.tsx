@@ -9,10 +9,9 @@ import { labels as allLabels, users } from "../store/data";
 interface TaskProps {
   id: number;
   index: number;
-  className?: string;
 }
 
-export default function Task({ id, index, className }: TaskProps) {
+export default function Task({ id, index }: TaskProps) {
   const task = useSelector((state: RootState) => state.task[id]);
 
   const {
