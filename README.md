@@ -1,46 +1,87 @@
-# Getting Started with Create React App
+# Frontend deo kanban app
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Instalacija (Install)
+```bash
+npm i --no-save
+```
 
-## Available Scripts
+## Pokretanje (Run)
+```bash
+npm run start
+```
 
-In the project directory, you can run:
 
-### `npm start`
+### Opis zadatka
+**Kratak opis:**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Data je frontend React aplikacija koja predstavlja Kanban prikaz, sa sledećim mogućnostima:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Zadaci (Tasks)
 
-### `npm test`
+ - Moguće je dodati novi zadatak u njegovu listu
+ - Završiti zadatak
+ - Prebaciti task iz liste u listu ili u kolonu gde su završeni zadaci
+ - Moguce je menjati pozicije zadataka u listi
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Liste (TaskLists)
 
-### `npm run build`
+- Moguće je završiti celu listu
+- Moguće je obrisati listu
+- Moguće je dodati novu listu
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+U sklopu aplikacije dodat je data.json  - koji predstavlja neku backend strukturu response-a. Možete ga koristiti da popunite vašu bazu ako želite (seed).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Vaš zadatak kao kandidata bi bio da napišete PHP Backend REST api aplikaciju koja komunicira sa frontend aplikacijom i podržava sve njene mogućnosti ali i dodatne stvari koje su zadate u kriterijumima kako bi frontend normalno fukncionisao sa vašim backend api-jem. Možete prilagoditi trenutnu frontend aplikaciju vašem backendu-u, bitno je samo da izgleda slično i radi isto sa pravim podacima iz vaše baze.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Za frontend aplikaciju su korišćeni paketi koji se najčešće koriste za ovakav tip aplikacije, react-redux, @redux/toolkit , react-beautiful-dnd itd. Svakako možete dodati one koji će vam omogućiti da aplikacija radi sa vašim backendom.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Prilikom izdrade api-ja moguće je koristiti bilo koji PHP framework i pakete koji vam olakšavaju izradu. Idealno bi bilo koristiti neke od sledećih relacionih tipova baza:MySQL, MariaDB, SQLite za bazu. Takodje možete koristiti i ORM alate i slično.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Bonus stavke vam donose dodatne poene koje će uticati na izbor da li ste baš Vi pravi kandidat za nas i odlučiće između ostalih kandidata (svaki dodatni rad na bonus zadacima uzeće se u razmatranje).
+
+
+
+**Kriterijumi za prihvatanje:**
+
+
+1. Postoji sql baza koja sadrži tabele: task_lists, users, labels, tasks i ostale tabele koje su vam potrebne za relacije.
+
+2. Tasks (Entitet)
+
+   1. Pripada uvek jednoj TaskList-i
+   2. Poredjani su po poziciji u TaskList-i
+   3. Moguće ga je zatvoriti (Complete).
+   4. Sadrži svojstva id, name (obavezno), completed_on itd. Videti data.json za više detalja.
+   5. Task može imati više zaduženih osoba (assignee).
+   6. Task može imati početak i krajni rok (start_on, due_on).
+   7. Taskovi se mogu premeštati iz liste u drugu listu.
+   8. Takođe moguće je promeniti poziciju u listi ili njegovu listu.
+   9. Moguće je dodati novi zadatak u listu.
+
+3. TaskList (Entitet)
+
+   1. Sadrži svoje taskove
+   2. Mogće je zatvoriti listu (kompletirati listu).
+      1. Prilikom zatvaranje, svi njeni taskovi su takođe markirani kao zatvoreni.
+   3. Moguće je obrisati listu (Soft Delete).
+   4. Moguće je dodati novu listu , gde je name obavezno polje.
+4. Neophodno je napraviti REST API koji komunicira sa frontend delom aplikacije.
+5. Podržati sve API endpoint-e u frontend aplikaciji i dohvatiti inicijalne podatke.
+6. Svaka akcija u frontend delu aplikacije bi trebala da pozove odgovarajucu na backendu i da stanje frontend aplikacije očitava ono stanje sa backend aplikacije.
+7. Postoji public git repozitorijum sa rešenjem ovog zadatka i uputstvom (dokumentacijom) kako se radi setup projekta.
+
+
+
+**Bonus:**
+
+
+1. Napraviti login stranicu za korisnika gde korisnik unosi email i lozinku za logovanje na aplikaciju.
+   1. Kanban prikaz je samo dostupan za ulogovane korisnike.
+2. Moguće je ažurirati zadatak i dodati zaduženu osobu ili promeniti sva njegova svojstva.
+3. Napisani su phpunit testovi za REST api.
