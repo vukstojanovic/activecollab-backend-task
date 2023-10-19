@@ -85,3 +85,5 @@ Bonus stavke vam donose dodatne poene koje će uticati na izbor da li ste baš V
    1. Kanban prikaz je samo dostupan za ulogovane korisnike.
 2. Moguće je ažurirati zadatak i dodati zaduženu osobu ili promeniti sva njegova svojstva.
 3. Napisani su phpunit testovi za REST api.
+
+
